@@ -15,6 +15,12 @@ from app.forms import ActividadForm
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
+@admin_bp.before_request
+def ir_al_login():
+    if login_manager.unauthorized():
+        abort(403)
+
+    if current_user.es_monitor
 
 @admin_bp.route("/actividad/nueva", methods=["GET", "POST"])
 def crear_actividad():
@@ -41,3 +47,4 @@ def editar_actividad(act_id):
 def eliminar_actividad(act_id):
     flash("Eliminación pendiente de implementar.", "info")
     return redirect(url_for("public.mostrar_actividades"))
+

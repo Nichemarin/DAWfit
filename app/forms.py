@@ -109,3 +109,8 @@ class CambiarPasswordForm(FlaskForm):
     """Formulario para cambiar la contraseña desde el perfil del socio."""
 
     submit = SubmitField("Actualizar Contraseña")
+
+class BuscarActividades(FlaskForm):
+    """ Formulario para buscar actividades """
+
+    texto = StringField()
