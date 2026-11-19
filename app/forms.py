@@ -58,27 +58,28 @@ class ActividadForm(FlaskForm):
     cuota = FloatField(
         "Cuota Mensual (€)",
         validators=[
-            DataRequired("Este dato es obligatorio"),
-            NumberRange(min=5.0, max=150.0),
+            DataRequired(message="La cuota es obligatoria"),
+            NumberRange(min=5.0, max=150.0, message="Valor entre 5.0 a 150.0"),
         ],
     )
     plazas_libres = IntegerField(
         "Plazas Libres",
+        validators=[
+            DataRequired(message="Las plazas son obligatorias"),
+            NumberRange(min=0),
+        ],
         default=10,
-        validators=[DataRequired("Este dato es obligatorio"), NumberRange(min=0)],
     )
     archivo_imagen = FileField(
         "Cartel de la Actividad (JPG, PNG)",
         validators=[FileAllowed(["jpg", "jpeg", "png"])],
     )
 
-    submit = SubmitField("Guardar Actividad")
-
     def validate_nombre(self, field):
         if Actividad.query.filter_by(nombre=field.data).first():
-            raise ValidationError(
-                "nombre de actividad que ya existe en la tabla de actividades."
-            )
+            raise ValidationError("Ese nombreya está en uso.")
+
+    submit = SubmitField("Guardar Actividad")
 
 
 class RegistroForm(FlaskForm):
@@ -90,6 +91,11 @@ class RegistroForm(FlaskForm):
             DataRequired(message="El nombre de usuario es obligatorio."),
             Length(min=3, max=50, message="Debe tener entre 3 y 50 caracteres."),
         ],
+    )
+
+    edad = IntegerField(
+        "Edad del usuario",
+        validators=[DataRequired("La edad es obligatoria"), NumberRange(min=16)],
     )
     email = StringField(
         "Correo Electrónico",
@@ -127,10 +133,16 @@ class RegistroForm(FlaskForm):
 class CambiarPasswordForm(FlaskForm):
     """Formulario para cambiar la contraseña desde el perfil del socio."""
 
+    password_actual = PasswordField(
+        validators=[DataRequired("La contraseña actual es obligatoria")]
+    )
+    nueva_password = PasswordField(
+        validators=[DataRequired("Este dato es obligatorio"), Length(min=6)]
+    )
+    confirmar_password = PasswordField(
+        validators=[
+            DataRequired("Debes confirmar la contraseña"),
+            EqualTo("nueva_password", message="Las contraseñas no coinciden"),
+        ]
+    )
     submit = SubmitField("Actualizar Contraseña")
-
-
-class BuscarActividades(FlaskForm):
-    """Formulario para buscar actividades"""
-
-    texto = StringField()
